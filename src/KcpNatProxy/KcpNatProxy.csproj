@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsTrimmable>true</IsTrimmable>
+
+    <NoWarn>$(NoWarn);CA1001;CA1031;CA2213</NoWarn>
+    <!-- CA1001: Types that own disposable fields should be disposable -->
+    <!-- CA1031: Do not catch general exception types -->
+    <!-- CA2213: Disposable fields should be disposed -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="KcpSharp" Version="$(KcpSharpPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsPackageVersion)" />
+  </ItemGroup>
+
+</Project>

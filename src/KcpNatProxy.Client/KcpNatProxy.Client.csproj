@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>npc</AssemblyName>
+
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+    <!-- CA2007: Do not directly await a Task -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="$(MicrosoftExtensionsPackageVersion)" />
+    <PackageReference Include="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KcpNatProxy\KcpNatProxy.csproj" />
+  </ItemGroup>
+
+</Project>
