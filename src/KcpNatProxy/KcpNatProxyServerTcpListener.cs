@@ -22,7 +22,7 @@ namespace KcpNatProxy
         private readonly ILogger _logger;
         private readonly ServiceNameHandle _nameHandle;
 
-        private readonly Int32IdPool _channelIdPool;
+        private readonly Int32IdPool2 _channelIdPool;
         private readonly ConcurrentDictionary<int, KcpNatProxyServerTcpTransport> _channels;
         private CancellationTokenSource? _cts;
 
@@ -41,7 +41,7 @@ namespace KcpNatProxy
             _mtu = mtu;
             _memoryPool = memoryPool;
             _logger = logger;
-            _channelIdPool = new Int32IdPool();
+            _channelIdPool = new Int32IdPool2();
             _channels = new ConcurrentDictionary<int, KcpNatProxyServerTcpTransport>();
         }
 
