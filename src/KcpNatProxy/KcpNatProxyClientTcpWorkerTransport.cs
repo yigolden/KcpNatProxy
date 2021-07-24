@@ -36,7 +36,7 @@ namespace KcpNatProxy
 
         public void Start(CancellationToken cancellationToken)
         {
-            _conversation = new KcpConversation(this, new KcpConversationOptions { BufferPool = _memoryPool, PreBufferSize = 8, UpdateInterval = 10, FastResend = 2, SendWindow = 1024, SendQueueSize = 2048, ReceiveWindow = 1024, StreamMode = true, NoDelay = _noDelay, Mtu = _mtu });
+            _conversation = new KcpConversation(this, new KcpConversationOptions { BufferPool = _memoryPool, PreBufferSize = 8, UpdateInterval = 30, FastResend = 2, SendWindow = 1024, SendQueueSize = 2048, ReceiveWindow = 1024, StreamMode = true, NoDelay = _noDelay, Mtu = _mtu });
             _ = Task.Run(() => RunAsync(cancellationToken), CancellationToken.None);
         }
 
