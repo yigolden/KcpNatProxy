@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup Label="Dependency Versions">
-    <KcpSharpPackageVersion>0.5.27</KcpSharpPackageVersion>
+    <KcpSharpPackageVersion>0.6.16-beta-g50e9c0db3a</KcpSharpPackageVersion>
 
     <SystemCommandLinePackageVersion>2.0.0-beta1.21308.1</SystemCommandLinePackageVersion>
-    <MicrosoftExtensionsPackageVersion>6.0.0-preview.6.21352.12</MicrosoftExtensionsPackageVersion>
+    <MicrosoftExtensionsPackageVersion>6.0.0-rc.2.21480.5</MicrosoftExtensionsPackageVersion>
 
-    <NerdbankGitVersioningPackageVersion>3.4.220</NerdbankGitVersioningPackageVersion>
+    <NerdbankGitVersioningPackageVersion>3.4.244</NerdbankGitVersioningPackageVersion>
   </PropertyGroup>
 </Project>
