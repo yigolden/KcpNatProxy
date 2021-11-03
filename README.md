@@ -7,31 +7,44 @@ KcpNatProxy is a reverse proxy to help you expose a local TCP/UDP server behind 
 ## Server Configuration
 ```
 {
-    "Listen": "0.0.0.0:8899",
-    "Password": "your-password", 
-    "Mtu": 1460
+    "Listen": {
+        "EndPoint": "your-server-address:6677",
+        "Mtu": 1420
+    },
+    "Credential": "your-password",
+    "Services": [
+        {
+            "Name": "rdp-tcp",
+            "ServiceType": "Tcp",
+            "Listen": "0.0.0.0:3389"
+        },
+        {
+            "Name": "rdp-udp",
+            "ServiceType": "Udp",
+            "Listen": "0.0.0.0:3389"
+        }
+    ]
 }
 ```
 
 ## Client Configuration
 ```
 {
-    "EndPoint": "your-server-address:8899",
-    "Password": "your-password",
-    "Mtu": 1460,
-    "Services":[
+    "Connect": {
+        "EndPoint": "your-server-address:6677",
+        "Mtu": 1400
+    },
+    "Credential": "1234",
+    "Providers": [
         {
             "Name": "rdp-tcp",
-            "Type": "tcp",
-            "RemoteListen": "0.0.0.0:3389",
-            "LocalForward": "127.0.0.1:3389",
-            "NoDelay": true
+            "ServiceType": "Tcp",
+            "Forward": "127.0.0.1:3389"
         },
         {
             "Name": "rdp-udp",
-            "Type": "udp",
-            "RemoteListen": "0.0.0.0:3389",
-            "LocalForward": "127.0.0.1:3389"
+            "ServiceType": "Udp",
+            "Forward": "127.0.0.1:3389"
         }
     ]
 }
