@@ -240,7 +240,7 @@ namespace KcpNatProxy.Client
                             }
 
                             // setup main connection
-                            connection.SetupKeepAlive(TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(40));
+                            connection.SetupKeepAlive(TimeSpan.FromSeconds(8), TimeSpan.FromSeconds(45));
                             connection.Register(this);
                             _connection = connection;
                             Log.LogClientConnected(_logger, sessionId);
