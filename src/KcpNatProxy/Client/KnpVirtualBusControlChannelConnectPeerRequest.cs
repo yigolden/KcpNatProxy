@@ -23,7 +23,7 @@ namespace KcpNatProxy.Client
         private readonly int _sessionId;
         private bool _requested;
 
-        public override bool IsExpired(DateTime utcNow) => _requested;
+        public override bool IsExpired(long ticks) => _requested;
 
         public KnpVirtualBusControlChannelConnectPeerRequest(int sessionId)
         {

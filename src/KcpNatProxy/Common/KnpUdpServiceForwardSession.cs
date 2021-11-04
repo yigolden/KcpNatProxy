@@ -13,7 +13,7 @@ namespace KcpNatProxy
         private readonly KnpUdpService _udpService;
         private readonly KnpRentedInt32 _forwardId;
         private readonly EndPoint _sourceEndPoint;
-        private long _lastActiveTime;
+        private long _lastActiveTimeTick;
 
         private readonly object _stateChangeLock = new();
         private byte[]? _bindingForwardIdBytes;
@@ -21,7 +21,7 @@ namespace KcpNatProxy
 
         public KnpUdpServiceBinding ServiceBinding => _host;
         public EndPoint EndPoint => _sourceEndPoint;
-        public bool IsExpired(DateTime utcNow) => utcNow - TimeSpan.FromSeconds(30) > DateTime.FromBinary(Interlocked.Read(ref _lastActiveTime));
+        public bool IsExpired(long tick) => (long)((ulong)tick - (ulong)Interlocked.Read(ref _lastActiveTimeTick)) > 30 * 1000;
 
         public KnpUdpServiceForwardSession(KnpUdpServiceBinding host, KnpUdpService udpService, KnpRentedInt32 forwardId, EndPoint sourceEndPoint)
         {
@@ -29,7 +29,7 @@ namespace KcpNatProxy
             _udpService = udpService;
             _forwardId = forwardId;
             _sourceEndPoint = sourceEndPoint;
-            _lastActiveTime = DateTime.UtcNow.ToBinary();
+            _lastActiveTimeTick = Environment.TickCount64;
         }
 
         public void Start()
@@ -70,13 +70,13 @@ namespace KcpNatProxy
 
         public ValueTask InputPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
         {
-            Interlocked.Exchange(ref _lastActiveTime, DateTime.UtcNow.ToBinary());
+            Interlocked.Exchange(ref _lastActiveTimeTick, Environment.TickCount64);
             return _udpService.SendPakcetAsync(packet, _sourceEndPoint, cancellationToken);
         }
 
         public ValueTask ForwardAsync(Memory<byte> packet, CancellationToken cancellationToken)
         {
-            Interlocked.Exchange(ref _lastActiveTime, DateTime.UtcNow.ToBinary());
+            Interlocked.Exchange(ref _lastActiveTimeTick, Environment.TickCount64);
             if (packet.Length > _host.Mss)
             {
                 return default;

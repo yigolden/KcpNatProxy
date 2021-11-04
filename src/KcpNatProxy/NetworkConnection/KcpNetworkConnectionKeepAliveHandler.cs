@@ -10,7 +10,7 @@ namespace KcpNatProxy.NetworkConnection
     {
         private readonly KcpNetworkConnection _networkConnection;
         private readonly IKcpConnectionKeepAliveContext? _keepAliveContext;
-        private readonly TimeSpan _expireTimeout;
+        private readonly long _expireTimeout;
         private uint _remoteNextSerial;
         private uint _lastSerial;
 
@@ -23,7 +23,7 @@ namespace KcpNatProxy.NetworkConnection
         {
             _networkConnection = networkConnection;
             _keepAliveContext = keepAliveContext;
-            _expireTimeout = expireTimeout;
+            _expireTimeout = (long)expireTimeout.TotalMilliseconds;
             if (interval.HasValue)
             {
                 _timer = new Timer(state =>
@@ -145,7 +145,7 @@ namespace KcpNatProxy.NetworkConnection
                     return;
                 }
 
-                DateTime threshold = DateTime.UtcNow - _expireTimeout;
+                long threshold = Environment.TickCount64 - _expireTimeout;
                 if (_networkConnection.TrySetToDead(threshold))
                 {
                     _isDead = true;

@@ -430,10 +430,10 @@ namespace KcpNatProxy.Server
                     Log.LogClientUnhandledException(_logger, ex);
                 }
 
-                DateTime utcNow = DateTime.UtcNow;
+                long tick = Environment.TickCount64;
                 foreach (KeyValuePair<long, IKnpForwardSession> item in _forwardSessions)
                 {
-                    if (item.Value.IsExpired(utcNow))
+                    if (item.Value.IsExpired(tick))
                     {
                         if (_forwardSessions.TryRemove(item))
                         {

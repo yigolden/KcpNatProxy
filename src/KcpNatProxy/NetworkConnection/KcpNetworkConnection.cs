@@ -35,7 +35,7 @@ namespace KcpNatProxy.NetworkConnection
         private KcpNetworkConnectionKeepAliveHandler? _keepAliveHandler;
 
         private uint _nextLocalSerial;
-        private long _lastActiveTimeTicks;
+        private long _lastActiveTimeTick;
         private SpinLock _remoteStatisticsLock;
         private uint _nextRemoteSerial;
         private uint _packetsReceived;
@@ -157,7 +157,7 @@ namespace KcpNatProxy.NetworkConnection
             }
             if (success)
             {
-                Interlocked.Exchange(ref _lastActiveTimeTicks, DateTime.UtcNow.ToBinary());
+                Interlocked.Exchange(ref _lastActiveTimeTick, Environment.TickCount64);
                 ChangeStateTo(KcpNetworkConnectionState.Connected);
             }
             else
@@ -187,7 +187,7 @@ namespace KcpNatProxy.NetworkConnection
 
         public void SkipNegotiation()
         {
-            Interlocked.Exchange(ref _lastActiveTimeTicks, DateTime.UtcNow.ToBinary());
+            Interlocked.Exchange(ref _lastActiveTimeTick, Environment.TickCount64);
             CheckAndChangeStateTo(KcpNetworkConnectionState.None, KcpNetworkConnectionState.Connecting);
             lock (_negotiationLock)
             {
@@ -216,14 +216,14 @@ namespace KcpNatProxy.NetworkConnection
             _keepAliveHandler = new KcpNetworkConnectionKeepAliveHandler(this, keepAliveContext, interval, expireTimeout);
         }
 
-        internal bool TrySetToDead(DateTime threshold)
+        internal bool TrySetToDead(long threshold)
         {
             if (_state != KcpNetworkConnectionState.Connected)
             {
                 return true;
             }
 
-            if (DateTime.FromBinary(Interlocked.Read(ref _lastActiveTimeTicks)) < threshold)
+            if ((long)((ulong)threshold - (ulong)Interlocked.Read(ref _lastActiveTimeTick)) > 0)
             {
                 ChangeStateTo(KcpNetworkConnectionState.Dead);
 
@@ -340,7 +340,7 @@ namespace KcpNatProxy.NetworkConnection
 
             if (processResult.GetValueOrDefault())
             {
-                Interlocked.Exchange(ref _lastActiveTimeTicks, DateTime.UtcNow.ToBinary());
+                Interlocked.Exchange(ref _lastActiveTimeTick, Environment.TickCount64);
             }
 
             if (remoteSerial.HasValue)

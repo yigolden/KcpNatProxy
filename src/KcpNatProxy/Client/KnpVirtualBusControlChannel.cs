@@ -34,7 +34,7 @@ namespace KcpNatProxy.Client
             _sender = new KnpVirtualBusControlChannelRequestList(_conversation, _host.Logger);
         }
 
-        public bool IsExpired(DateTime utcNow) => false;
+        public bool IsExpired(long tick) => _conversation is null;
         public void Dispose()
         {
             Interlocked.Exchange(ref _conversation, null)?.Dispose();

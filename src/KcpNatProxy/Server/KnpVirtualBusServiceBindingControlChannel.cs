@@ -77,7 +77,7 @@ namespace KcpNatProxy.Server
             }
         }
 
-        public bool IsExpired(DateTime utcNow) => _disposed;
+        public bool IsExpired(long tick) => _disposed;
 
         async void IThreadPoolWorkItem.Execute()
         {

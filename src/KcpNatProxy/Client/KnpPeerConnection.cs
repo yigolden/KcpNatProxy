@@ -24,7 +24,7 @@ namespace KcpNatProxy.Client
         private readonly ConcurrentDictionary<long, IKnpForwardSession> _forwardSessions = new();
 
         private readonly object _stateChangeLock = new();
-        private long _initializeTimeTicks;
+        private long _initializeTimeTick;
         private bool _detached;
         private bool _disposed;
         private CancellationTokenSource? _cts;
@@ -67,7 +67,7 @@ namespace KcpNatProxy.Client
                 return _forwardSessions.IsEmpty;
             }
 
-            long initializeTime = Interlocked.Read(ref _initializeTimeTicks);
+            long initializeTime = Interlocked.Read(ref _initializeTimeTick);
             if (initializeTime == 0)
             {
                 // not initialized
@@ -106,23 +106,23 @@ namespace KcpNatProxy.Client
 
         public void Initialize(KnpVirtualBusControlChannel controlChannel, ConcurrentDictionary<int, IKnpVirtualBusProviderFactory> factoryMappings, bool connectNow)
         {
-            if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTicks) != 0)
+            if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTick) != 0)
             {
                 return;
             }
             KnpPeerServerReflexConnection serverReflexConnection;
             lock (_stateChangeLock)
             {
-                if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTicks) != 0)
+                if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTick) != 0)
                 {
                     return;
                 }
-                long ticks = Environment.TickCount64;
-                if (ticks == 0)
+                long tick = Environment.TickCount64;
+                if (tick == 0)
                 {
-                    ticks = 1;
+                    tick = 1;
                 }
-                Interlocked.Exchange(ref _initializeTimeTicks, ticks);
+                Interlocked.Exchange(ref _initializeTimeTick, tick);
                 _factoryMappings = factoryMappings;
 
                 _cts = new CancellationTokenSource();
@@ -149,7 +149,7 @@ namespace KcpNatProxy.Client
             lock (_stateChangeLock)
             {
                 serverReflexConnection = _serverReflexConnection;
-                if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTicks) == 0 || serverReflexConnection is null)
+                if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTick) == 0 || serverReflexConnection is null)
                 {
                     return;
                 }
@@ -246,14 +246,14 @@ namespace KcpNatProxy.Client
 
         public void SetupServerRelay(IKnpConnectionHost host, int bindingId)
         {
-            if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTicks) == 0 || _serverRelayConnection is not null)
+            if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTick) == 0 || _serverRelayConnection is not null)
             {
                 return;
             }
             KnpPeerServerRelayConnection serverRelayConnection;
             lock (_stateChangeLock)
             {
-                if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTicks) == 0 || _serverRelayConnection is not null)
+                if (_disposed || _detached || Interlocked.Read(ref _initializeTimeTick) == 0 || _serverRelayConnection is not null)
                 {
                     return;
                 }
@@ -367,7 +367,7 @@ namespace KcpNatProxy.Client
             CancellationToken cancellationToken;
             lock (_stateChangeLock)
             {
-                if (_disposed || Interlocked.Read(ref _initializeTimeTicks) == 0 || _cts is null)
+                if (_disposed || Interlocked.Read(ref _initializeTimeTick) == 0 || _cts is null)
                 {
                     return;
                 }
@@ -391,10 +391,10 @@ namespace KcpNatProxy.Client
                     Log.LogClientUnhandledException(_parent.Logger, ex);
                 }
 
-                DateTime utcNow = DateTime.UtcNow;
+                long tick = Environment.TickCount64;
                 foreach (KeyValuePair<long, IKnpForwardSession> item in _forwardSessions)
                 {
-                    if (item.Value.IsExpired(utcNow))
+                    if (item.Value.IsExpired(tick))
                     {
                         if (_forwardSessions.TryRemove(item))
                         {

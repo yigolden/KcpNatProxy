@@ -21,7 +21,7 @@ namespace KcpNatProxy.NetworkConnection
         private Timer? _timer;
 
         private byte _sendSerial;
-        private uint _sendTicks;
+        private uint _sendTick;
         private KcpRentedBuffer _sendBuffer;
         private byte _sendRetryCount;
         private byte _localReadyState; // 0b00-none 0b01-success 0b10-failed
@@ -53,7 +53,7 @@ namespace KcpNatProxy.NetworkConnection
 
             lock (_activityLock)
             {
-                _sendTicks = (uint)Environment.TickCount;
+                _sendTick = (uint)Environment.TickCount;
 
                 _timer = new Timer(static state =>
                 {
@@ -229,7 +229,7 @@ namespace KcpNatProxy.NetworkConnection
                 }
 
                 // sending side
-                if (!_sendSuppressed && (int)((uint)Environment.TickCount - _sendTicks) > 0)
+                if (!_sendSuppressed && (int)((uint)Environment.TickCount - _sendTick) > 0)
                 {
                     bool? continueState = null;
                     KcpConnectionNegotiationResult result = KcpConnectionNegotiationResult.ContinuationRequired;
@@ -265,11 +265,11 @@ namespace KcpNatProxy.NetworkConnection
 
                     if (!sendResult)
                     {
-                        _sendTicks = (uint)Environment.TickCount + 1000;
+                        _sendTick = (uint)Environment.TickCount + 1000;
                     }
                     else
                     {
-                        _sendTicks = (uint)Environment.TickCount + DetermineSendInterval(ref _sendRetryCount);
+                        _sendTick = (uint)Environment.TickCount + DetermineSendInterval(ref _sendRetryCount);
                     }
 
                     return result.IsFailed ? false : continueState;
@@ -364,7 +364,7 @@ namespace KcpNatProxy.NetworkConnection
                 if (localSerial == (byte)(1 + _sendSerial))
                 {
                     _sendSerial++;
-                    _sendTicks = (uint)Environment.TickCount;
+                    _sendTick = (uint)Environment.TickCount;
                     _sendBuffer.Dispose();
                     _sendBuffer = default;
                     _sendRetryCount = 0;
@@ -413,7 +413,7 @@ namespace KcpNatProxy.NetworkConnection
                 _remoteReadyState = 0b01;
                 _receivePending = true;
                 _sendSuppressed = false;
-                _sendTicks = (uint)Environment.TickCount;
+                _sendTick = (uint)Environment.TickCount;
             }
 
             ThreadPool.UnsafeQueueUserWorkItem(this, preferLocal: false);

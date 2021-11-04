@@ -112,7 +112,7 @@ namespace KcpNatProxy.Client
             _host.NotifySessionClosed(_forwardId, this);
         }
 
-        public bool IsExpired(DateTime utcNow) => false;
+        public bool IsExpired(long tick) => _disposed;
 
         public ValueTask InputPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
         {

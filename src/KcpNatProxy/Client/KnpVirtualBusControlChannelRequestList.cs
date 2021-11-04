@@ -111,7 +111,7 @@ namespace KcpNatProxy.Client
                 }
             }
 
-            ValueTask<TResult?> task = request.WaitAsync(DateTime.UtcNow, cancellationToken);
+            ValueTask<TResult?> task = request.WaitAsync(Environment.TickCount64, cancellationToken);
             if (!task.IsCompleted)
             {
                 _querySignal.TrySet(request);
@@ -146,8 +146,8 @@ namespace KcpNatProxy.Client
                     }
 
                     // send and receive query
-                    DateTime utcNow = DateTime.UtcNow;
-                    if (!query.IsExpired(utcNow))
+                    long tick = Environment.TickCount64;
+                    if (!query.IsExpired(tick))
                     {
                         if (!await SendAndReceiveAsync(query, cancellationToken).ConfigureAwait(false))
                         {

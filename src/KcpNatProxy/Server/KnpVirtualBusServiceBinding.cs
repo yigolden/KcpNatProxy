@@ -19,7 +19,7 @@ namespace KcpNatProxy
         private readonly IKnpConnectionHost _host;
         private readonly int _sessionId;
         private readonly KnpRentedInt32 _bindingId;
-        private long _lastResetTime;
+        private long _lastResetTimeTick;
 
         private readonly object _stateChangeLock = new();
         private KnpVirtualBusServiceBindingControlChannel? _controlChannel;
@@ -46,7 +46,7 @@ namespace KcpNatProxy
                 throw new NotSupportedException();
             }
             _sessionId = sessionId;
-            _lastResetTime = DateTime.UtcNow.ToBinary();
+            _lastResetTimeTick = Environment.TickCount64;
         }
 
         public KnpVirtualBusServiceBinding? FindOtherClient(int sessionId)
@@ -275,13 +275,12 @@ namespace KcpNatProxy
 
         private ValueTask SendBackResetAsync(ReadOnlyMemory<byte> targetBindingSessionId, CancellationToken cancellationToken)
         {
-            DateTime lastSendTime = DateTime.FromBinary(Interlocked.Read(ref _lastResetTime));
-            DateTime utcNow = DateTime.UtcNow;
-            if (utcNow.Subtract(TimeSpan.FromMilliseconds(400)) < lastSendTime)
+            long tick = Environment.TickCount64;
+            long lastResetTimeTick = Interlocked.Exchange(ref _lastResetTimeTick, tick);
+            if ((long)((ulong)tick - (ulong)lastResetTimeTick) < 400)
             {
                 return default;
             }
-            Interlocked.Exchange(ref _lastResetTime, utcNow.ToBinary());
 
             using var bufferList = KcpRentedBufferList.Allocate(ConstantByteArrayCache.FFByte);
             return _host.SendAsync(bufferList.AddPreBuffer(targetBindingSessionId), cancellationToken);

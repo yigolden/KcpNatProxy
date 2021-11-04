@@ -71,7 +71,7 @@ namespace KcpNatProxy.Server
             }
         }
 
-        public bool IsExpired(DateTime utcNow) => _disposed;
+        public bool IsExpired(long tick) => _disposed;
 
         public ValueTask InputPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
             => _conversation.InputPakcetAsync(packet, cancellationToken);

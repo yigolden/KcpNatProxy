@@ -24,7 +24,7 @@ namespace KcpNatProxy.Client
         private readonly object _stateChangeLock = new();
         private Socket? _socket;
         private CancellationTokenSource? _cts;
-        private long _lastActiveTime;
+        private long _lastActiveTimeTick;
         private bool _disposed;
 
         public KnpUdpProviderForwardSession(IKnpForwardHost host, IKcpBufferPool bufferPool, int forwardId, EndPoint forwardEndPoint, ILogger logger)
@@ -48,7 +48,7 @@ namespace KcpNatProxy.Client
                 _cts = new CancellationTokenSource();
                 _socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
                 SocketHelper.PatchSocket(_socket);
-                Interlocked.Exchange(ref _lastActiveTime, DateTime.UtcNow.ToBinary());
+                Interlocked.Exchange(ref _lastActiveTimeTick, Environment.TickCount64);
                 _socket.Connect(_forwardEndPoint);
             }
             ThreadPool.UnsafeQueueUserWorkItem(this, false);
@@ -84,11 +84,11 @@ namespace KcpNatProxy.Client
             _host.NotifySessionClosed(_forwardId, this);
         }
 
-        public bool IsExpired(DateTime utcNow) => utcNow - TimeSpan.FromSeconds(30) > DateTime.FromBinary(Interlocked.Read(ref _lastActiveTime));
+        public bool IsExpired(long tick) => (long)((ulong)tick - (ulong)_lastActiveTimeTick) > 30 * 1000;
 
         public async ValueTask InputPacketAsync(ReadOnlyMemory<byte> packet, CancellationToken cancellationToken)
         {
-            Interlocked.Exchange(ref _lastActiveTime, DateTime.UtcNow.ToBinary());
+            Interlocked.Exchange(ref _lastActiveTimeTick, Environment.TickCount64);
             Socket? socket = Volatile.Read(ref _socket);
             if (socket is null)
             {
@@ -154,7 +154,7 @@ namespace KcpNatProxy.Client
                     continue;
                 }
 
-                Interlocked.Exchange(ref _lastActiveTime, DateTime.UtcNow.ToBinary());
+                Interlocked.Exchange(ref _lastActiveTimeTick, Environment.TickCount64);
 
                 try
                 {

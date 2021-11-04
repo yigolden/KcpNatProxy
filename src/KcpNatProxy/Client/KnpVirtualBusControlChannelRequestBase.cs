@@ -8,7 +8,7 @@ namespace KcpNatProxy.Client
     internal abstract class KnpVirtualBusControlChannelRequestBase : IDisposable
     {
         public virtual bool AllowCache => false;
-        public virtual bool IsExpired(DateTime utcNow) => !AllowCache;
+        public virtual bool IsExpired(long tick) => !AllowCache;
 
         public abstract int WriteRequest(Span<byte> buffer);
         public abstract void SetResult(ReadOnlySpan<byte> data);
@@ -19,13 +19,13 @@ namespace KcpNatProxy.Client
     {
         private readonly SimpleLinkedList<CallbackNode> _waitList = new();
         private TResult? _result;
-        private long _lastUpdateTime;
+        private long _lastUpdateTimeTick;
         private bool _updated;
         private bool _disposed;
 
         public abstract bool CheckParameterMatches<TParameter>(TParameter parameter) where TParameter : notnull;
         public abstract TResult? ParseResponse(ReadOnlySpan<byte> data);
-        public DateTime? LastUpdateTime => _updated ? DateTime.FromBinary(Interlocked.Read(ref _lastUpdateTime)) : null;
+        public long? LastUpdateTimeTick => _updated ? Interlocked.Read(ref _lastUpdateTimeTick) : null;
 
         private void LockAndRemove(CallbackNode callback)
         {
@@ -35,7 +35,7 @@ namespace KcpNatProxy.Client
             }
         }
 
-        public ValueTask<TResult?> WaitAsync(DateTime utcNow, CancellationToken cancellationToken)
+        public ValueTask<TResult?> WaitAsync(long tick, CancellationToken cancellationToken)
         {
             if (_disposed)
             {
@@ -54,7 +54,7 @@ namespace KcpNatProxy.Client
                     return ValueTask.FromCanceled<TResult?>(cancellationToken);
                 }
 
-                if (_updated && !IsExpired(utcNow))
+                if (_updated && !IsExpired(tick))
                 {
                     return new ValueTask<TResult?>(_result);
                 }
@@ -72,7 +72,7 @@ namespace KcpNatProxy.Client
             lock (_waitList)
             {
                 _result = ParseResponse(data);
-                Interlocked.Exchange(ref _lastUpdateTime, DateTime.UtcNow.ToBinary());
+                Interlocked.Exchange(ref _lastUpdateTimeTick, Environment.TickCount64);
                 _updated = true;
 
                 SimpleLinkedListNode<CallbackNode>? node = _waitList.First;

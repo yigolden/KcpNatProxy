@@ -31,7 +31,7 @@ namespace KcpNatProxy.Client
             Dead,
         }
 
-        bool IKnpForwardSession.IsExpired(DateTime utcNow) => _status == ConnectionStatus.Dead;
+        bool IKnpForwardSession.IsExpired(long tick) => _status == ConnectionStatus.Dead;
         EndPoint? IKcpNetworkEndPointTransport.RemoteEndPoint => null;
 
         public bool IsConnected => _status == ConnectionStatus.Connected;

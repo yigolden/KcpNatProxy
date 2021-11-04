@@ -30,7 +30,11 @@ namespace KcpNatProxy.Client
         }
 
         public override bool AllowCache => true;
-        public override bool IsExpired(DateTime utcNow) => LastUpdateTime.HasValue && utcNow.Subtract(TimeSpan.FromSeconds(20)) > LastUpdateTime.GetValueOrDefault();
+        public override bool IsExpired(long tick)
+        {
+            long? lastUpdateTimeTick = LastUpdateTimeTick;
+            return lastUpdateTimeTick.HasValue && (long)((ulong)tick - (ulong)LastUpdateTimeTick.GetValueOrDefault()) > 20 * 1000;
+        }
 
         public override bool CheckParameterMatches<TParameter>(TParameter parameter)
         {

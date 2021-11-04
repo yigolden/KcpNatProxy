@@ -50,7 +50,7 @@ namespace KcpNatProxy.Client
 
             ThreadPool.UnsafeQueueUserWorkItem(this, false);
         }
-        public bool IsExpired(DateTime utcNow) => _disposed;
+        public bool IsExpired(long tick) => _disposed;
         public void Dispose()
         {
             if (_disposed)
