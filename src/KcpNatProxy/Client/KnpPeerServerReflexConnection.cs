@@ -292,6 +292,13 @@ namespace KcpNatProxy.Client
             // probing phase
             Log.LogPeerServerReflexConnectionProbingStarted(_peerConnection.Logger, _sessionId, connectionInfo.EndPoint);
             _receiver.TryRegister(connectionInfo.AccessSecret, this);
+
+            IPEndPoint probeEndPoint1 = connectionInfo.EndPoint;
+            IPEndPoint? probeEndPoint2 = null;
+            if (probeEndPoint1.Port >= 1024 && probeEndPoint1.Port < ushort.MaxValue)
+            {
+                probeEndPoint2 = new IPEndPoint(probeEndPoint1.Address, probeEndPoint1.Port + 1);
+            }
             try
             {
                 using var timer = new PeriodicTimer(TimeSpan.FromSeconds(0.5));
@@ -299,7 +306,11 @@ namespace KcpNatProxy.Client
                 while (!cancellationToken.IsCancellationRequested && countdown > 0)
                 {
                     // send probe message
-                    await _receiver.SendProbingMessageAsync(_sessionId, connectionInfo.AccessSecret, connectionInfo.EndPoint, cancellationToken).ConfigureAwait(false);
+                    await _receiver.SendProbingMessageAsync(_sessionId, connectionInfo.AccessSecret, probeEndPoint1, cancellationToken).ConfigureAwait(false);
+                    if (probeEndPoint2 is not null)
+                    {
+                        await _receiver.SendProbingMessageAsync(_sessionId, connectionInfo.AccessSecret, probeEndPoint2, cancellationToken).ConfigureAwait(false);
+                    }
 
                     countdown--;
 
