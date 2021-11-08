@@ -200,7 +200,11 @@ namespace KcpNatProxy.SocketTransport
                     }
                 }
             }
-            Interlocked.Exchange(ref _fallbackApplication, null)?.SetTransportClosed();
+            IKcpNetworkApplication? fallbackApplication = Interlocked.Exchange(ref _fallbackApplication, null);
+            if (fallbackApplication is not null)
+            {
+                await fallbackApplication.SetTransportClosedAsync().ConfigureAwait(false);
+            }
         }
 
         private async Task ReceiveLoop(EndPoint remoteEndPoint, CancellationToken cancellationToken)
