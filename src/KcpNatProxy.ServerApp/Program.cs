@@ -44,7 +44,9 @@ static void BuildRootCommand(Command command)
         new Option<bool>(new string[] { "--trace", "-t" }, "Enable trace level logging. (very verbose)")
         {
             Arity = ArgumentArity.ZeroOrOne,
+#if !WITH_TRACE_LOGGING
             IsHidden = true
+#endif
         };
 }
 
