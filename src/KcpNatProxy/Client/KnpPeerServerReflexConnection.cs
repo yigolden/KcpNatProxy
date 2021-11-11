@@ -34,7 +34,7 @@ namespace KcpNatProxy.Client
         }
 
         public bool IsConnected => _status == ConnectionStatus.Connected;
-        public bool IsConnectionDegraded => _status == ConnectionStatus.Connected && (long)((ulong)Environment.TickCount64 - (ulong)Interlocked.Read(ref _lastActiveTimeTick)) > 24 * 1000;
+        public bool IsConnectionDegraded => _status == ConnectionStatus.Connected && (long)((ulong)Environment.TickCount64 - (ulong)Interlocked.Read(ref _lastActiveTimeTick)) > 16 * 1000;
 
         public bool TryGetMss(out int mss)
         {
