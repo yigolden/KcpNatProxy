@@ -35,9 +35,6 @@ namespace KcpNatProxy.Server
 
         internal KnpRentedInt32 AllocateBindingId() => _bindingIdAllocator.Allocate();
 
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServerOptions))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServerListenOptions))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServiceDescription))]
         public KnpServer(KnpServerOptions options, ILogger<KnpServer> logger)
         {
             if (options is null)

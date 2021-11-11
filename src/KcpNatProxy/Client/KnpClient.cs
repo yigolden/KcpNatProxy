@@ -51,10 +51,6 @@ namespace KcpNatProxy.Client
             return false;
         }
 
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpClientOptions))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpClientConnectOptions))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpProviderDescription))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServiceDescription))]
         public KnpClient(KnpClientOptions options, ILogger<KnpClient> logger)
         {
             if (options is null)

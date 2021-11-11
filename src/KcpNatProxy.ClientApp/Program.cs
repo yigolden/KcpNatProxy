@@ -2,6 +2,7 @@
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using KcpNatProxy.Client;
 using KcpNatProxy.ClientApp;
 
@@ -45,6 +46,11 @@ static void BuildRootCommand(Command command)
         };
 }
 
+[UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026")]
+[DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpClientOptions))]
+[DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpClientConnectOptions))]
+[DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpProviderDescription))]
+[DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServiceDescription))]
 static async Task RunAsync(FileInfo config, bool verbose, bool trace, CancellationToken cancellationToken)
 {
     if (config is null || !config.Exists)

@@ -49,6 +49,9 @@ static void BuildRootCommand(Command command)
 }
 
 [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026")]
+[DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServerOptions))]
+[DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServerListenOptions))]
+[DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServiceDescription))]
 static async Task RunAsync(FileInfo config, bool verbose, bool trace, CancellationToken cancellationToken)
 {
     if (config is null || !config.Exists)
