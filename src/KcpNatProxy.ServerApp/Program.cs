@@ -12,10 +12,7 @@ BuildRootCommand(builder.Command);
 
 builder.UseVersionOption();
 
-builder.UseHelp();
-builder.UseSuggestDirective();
-builder.RegisterWithDotnetSuggest();
-builder.UseParseErrorReporting();
+builder.UseDefaults();
 
 Parser parser = builder.Build();
 return await parser.InvokeAsync(args).ConfigureAwait(false);

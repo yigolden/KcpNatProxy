@@ -5,21 +5,16 @@ namespace KcpNatProxy.Server
 {
     public class KnpServerOptions
     {
-        public KnpServerListenOptions[]? Listen { get; set; }
+        public KnpServerListenOptions? Listen { get; set; }
         public string? Credential { get; set; }
         public KnpServiceDescription[]? Services { get; set; }
 
         [MemberNotNullWhen(true, nameof(Listen), nameof(Services))]
         public bool Validate([NotNullWhen(false)] out string? errorMessage)
         {
-            if (Listen is null || Listen.Length == 0)
+            if (Listen is null)
             {
                 errorMessage = "Server listen endpoint is not configured.";
-                return false;
-            }
-            if (Listen.Length != 1)
-            {
-                errorMessage = "Only one listen endpoint is allowed currently.";
                 return false;
             }
             if (!string.IsNullOrEmpty(Credential) && Encoding.UTF8.GetByteCount(Credential) > 64)

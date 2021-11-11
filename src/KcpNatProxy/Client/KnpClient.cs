@@ -51,6 +51,10 @@ namespace KcpNatProxy.Client
             return false;
         }
 
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpClientOptions))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpClientConnectOptions))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpProviderDescription))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServiceDescription))]
         public KnpClient(KnpClientOptions options, ILogger<KnpClient> logger)
         {
             if (options is null)
@@ -63,7 +67,7 @@ namespace KcpNatProxy.Client
             {
                 throw new ArgumentException(errorMessage, nameof(options));
             }
-            KnpClientConnectOptions connectEndPoint = options.Connect[0];
+            KnpClientConnectOptions connectEndPoint = options.Connect;
             if (!connectEndPoint.Validate(out errorMessage, out EndPoint? endPoint))
             {
                 throw new ArgumentException(errorMessage, nameof(options));

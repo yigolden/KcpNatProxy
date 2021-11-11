@@ -5,7 +5,7 @@ namespace KcpNatProxy.Client
 {
     public class KnpClientOptions
     {
-        public KnpClientConnectOptions[]? Connect { get; set; }
+        public KnpClientConnectOptions? Connect { get; set; }
         public string? Credential { get; set; }
         public KnpProviderDescription[]? Providers { get; set; }
         public KnpServiceDescription[]? Services { get; set; }
@@ -13,14 +13,9 @@ namespace KcpNatProxy.Client
         [MemberNotNullWhen(true, nameof(Connect))]
         public bool Validate([NotNullWhen(false)] out string? errorMessage)
         {
-            if (Connect is null || Connect.Length == 0)
+            if (Connect is null)
             {
                 errorMessage = "Server connect endpoint is not configured.";
-                return false;
-            }
-            if (Connect.Length != 1)
-            {
-                errorMessage = "Only one connect endpoint is allowed currently.";
                 return false;
             }
             if (!string.IsNullOrEmpty(Credential) && Encoding.UTF8.GetByteCount(Credential) > 64)

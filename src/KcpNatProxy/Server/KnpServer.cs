@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -34,6 +35,9 @@ namespace KcpNatProxy.Server
 
         internal KnpRentedInt32 AllocateBindingId() => _bindingIdAllocator.Allocate();
 
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServerOptions))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServerListenOptions))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(KnpServiceDescription))]
         public KnpServer(KnpServerOptions options, ILogger<KnpServer> logger)
         {
             if (options is null)
@@ -48,7 +52,7 @@ namespace KcpNatProxy.Server
             {
                 throw new ArgumentException(errorMessage, nameof(options));
             }
-            KnpServerListenOptions listenEndPoint = options.Listen[0];
+            KnpServerListenOptions listenEndPoint = options.Listen;
             if (!listenEndPoint.Validate(out errorMessage, out IPEndPoint? endPoint))
             {
                 throw new ArgumentException(errorMessage, nameof(options));
