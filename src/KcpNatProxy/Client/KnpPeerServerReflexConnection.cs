@@ -442,7 +442,7 @@ namespace KcpNatProxy.Client
                 negotiated = await connection.NegotiateAsync(negotiationContext, cts.Token).ConfigureAwait(false);
                 if (negotiated)
                 {
-                    connection.SetupKeepAlive(this, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(40));
+                    connection.SetupKeepAlive(this, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(40));
                     connection.Register(this);
                     Log.LogPeerServerReflexConnectionConnected(_peerConnection.Logger, _sessionId, connection.RemoteEndPoint, negotiationContext.NegotiatedMtu.GetValueOrDefault());
                 }
