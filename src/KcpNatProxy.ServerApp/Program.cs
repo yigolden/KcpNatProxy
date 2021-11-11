@@ -2,6 +2,7 @@
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using KcpNatProxy.Server;
 using KcpNatProxy.ServerApp;
 
@@ -47,6 +48,7 @@ static void BuildRootCommand(Command command)
         };
 }
 
+[UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026")]
 static async Task RunAsync(FileInfo config, bool verbose, bool trace, CancellationToken cancellationToken)
 {
     if (config is null || !config.Exists)
