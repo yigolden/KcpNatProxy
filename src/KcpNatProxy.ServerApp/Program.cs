@@ -11,8 +11,6 @@ builder.Command.Description = "KcpNatProxy server.";
 
 BuildRootCommand(builder.Command);
 
-builder.UseVersionOption();
-
 builder.UseDefaults();
 
 Parser parser = builder.Build();
