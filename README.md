@@ -5,7 +5,7 @@ KcpNatProxy is a reverse proxy to help you expose a local TCP/UDP server behind 
 # Configuration File Sample
 
 ## Server Configuration
-```
+```json
 {
     "Listen": {
         "EndPoint": "your-server-address:6677",
@@ -28,7 +28,7 @@ KcpNatProxy is a reverse proxy to help you expose a local TCP/UDP server behind 
 ```
 
 ## Client Configuration
-```
+```json
 {
     "Connect": {
         "EndPoint": "your-server-address:6677",
@@ -48,4 +48,19 @@ KcpNatProxy is a reverse proxy to help you expose a local TCP/UDP server behind 
         }
     ]
 }
+```
+
+### Systemd service configuration sample
+```ini
+[Unit]
+Description=knps server
+After=network.target
+
+[Service]
+Type=notify
+WorkingDirectory=/opt/knp
+ExecStart=/opt/knp/knps -c /opt/knp/knps.json
+
+[Install]
+WantedBy=multi-user.target
 ```
